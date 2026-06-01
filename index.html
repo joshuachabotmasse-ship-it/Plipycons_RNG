@@ -1,104 +1,432 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Independent Odds RNG</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Independent Odds RNG with Luck</title>
+    <style>
+        :root {
+            --bg-color: #0b1329; /* Deep blue background */
+            --card-bg: #1c2541; /* Slightly lighter deep blue for container */
+            --accent: #3a86ff;
+            --text-main: #edf2f4;
+            --text-muted: #8d99ae;
+            --border: #3a506b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 750px;
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* Luck Configuration Panel */
+        .luck-panel {
+            background: rgba(58, 134, 255, 0.1);
+            border: 1px dashed var(--accent);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .luck-panel label {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .luck-panel input {
+            width: 80px;
+            padding: 8px;
+            background: #0b1329;
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .item-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex: 2;
+            min-width: 130px;
+            padding: 10px;
+            background: #0b1329;
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .chance-input-wrapper {
+            flex: 1;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #0b1329;
+            border: 1px solid var(--border);
+            padding: 0 10px;
+            border-radius: 6px;
+        }
+
+        .chance-input-wrapper span {
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .chance-input-wrapper input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 10px 0;
+            outline: none;
+        }
+
+        select.font-select {
+            flex: 1;
+            min-width: 110px;
+            padding: 10px;
+            background: #0b1329;
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 6px;
+            cursor: pointer;
+            background: none;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        button.btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-add {
+            background: transparent;
+            color: var(--accent);
+            border: 2px dashed var(--accent) !important;
+        }
+
+        .btn-add:hover {
+            background: rgba(58, 134, 255, 0.15);
+        }
+
+        .btn-roll {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-roll:hover {
+            background: #2563eb;
+        }
+
+        .display-panel {
+            background: #0b1329;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        #resultDisplay {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .winner-tag {
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 1.8rem;
+            font-weight: bold;
+            animation: pop 0.2s ease-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
 </head>
 <body>
 
+<div class="container">
     <h1>Independent Odds RNG</h1>
-    <p>Each item rolls independently. You can win multiple prizes or nothing at all!</p>
+    <p class="subtitle">Prizes roll one after the other. Luck modifies your odds ($Denominator \div Luck$).</p>
 
-    <div id="itemList">
-        <div class="item-row" style="margin-bottom: 10px;">
-            <input type="text" class="item-name" value="Common Prize">
-            <span> Chance: 1 / </span>
-            <input type="number" class="item-denominator" value="2">
-            <input type="color" class="item-color" value="#00ff00">
+    <div class="luck-panel">
+        <label for="luckMultiplier">🍀 Your Luck Multiplier:</label>
+        <input type="number" id="luckMultiplier" value="1" min="0.1" step="any">
+    </div>
+
+    <div class="item-list" id="itemList">
+        <div class="item-row">
+            <input type="text" class="item-name" value="Common Shield">
+            <div class="chance-input-wrapper">
+                <span>1/</span>
+                <input type="number" class="item-denominator" value="2" min="0.001" step="any">
+            </div>
+            <select class="font-select">
+                <option value="sans-serif" selected>Sans-Serif</option>
+                <option value="serif">Serif</option>
+                <option value="monospace">Monospace</option>
+                <option value="fantasy">Fantasy</option>
+                <option value="cursive">Cursive</option>
+            </select>
+            <input type="color" class="item-color" value="#00ffc4">
+            <button class="btn-delete">×</button>
         </div>
-        <div class="item-row" style="margin-bottom: 10px;">
-            <input type="text" class="item-name" value="Rare Prize">
-            <span> Chance: 1 / </span>
-            <input type="number" class="item-denominator" value="4">
-            <input type="color" class="item-color" value="#0000ff">
+        
+        <div class="item-row">
+            <input type="text" class="item-name" value="Legendary Sword">
+            <div class="chance-input-wrapper">
+                <span>1/</span>
+                <input type="number" class="item-denominator" value="10" min="0.001" step="any">
+            </div>
+            <select class="font-select">
+                <option value="sans-serif">Sans-Serif</option>
+                <option value="serif">Serif</option>
+                <option value="monospace">Monospace</option>
+                <option value="fantasy" selected>Fantasy</option>
+                <option value="cursive">Cursive</option>
+            </select>
+            <input type="color" class="item-color" value="#ff007f">
+            <button class="btn-delete">×</button>
         </div>
     </div>
 
-    <div style="margin-top: 20px; margin-bottom: 20px;">
-        <button id="addBtn">+ Add New Item</button>
-        <button id="rollBtn" style="font-weight: bold; padding: 5px 15px;">ROLL!</button>
+    <div class="action-btns">
+        <button class="btn btn-add" id="addBtn">+ Add New Item</button>
+        <button class="btn btn-roll" id="rollBtn">ROLL!</button>
     </div>
 
-    <hr>
-    <h2>Results:</h2>
-    <div id="resultDisplay" style="font-size: 1.5rem; font-weight: bold; min-height: 50px;">
-        —
+    <div class="display-panel">
+        <div class="result-label">Items Won This Roll</div>
+        <div id="resultDisplay">
+            <span style="color: var(--text-muted); font-size: 1.5rem;">— Click Roll —</span>
+        </div>
     </div>
+</div>
 
-    <script>
-        window.onload = function() {
-            const itemList = document.getElementById('itemList');
-            const addBtn = document.getElementById('addBtn');
-            const rollBtn = document.getElementById('rollBtn');
-            const display = document.getElementById('resultDisplay');
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const itemList = document.getElementById('itemList');
+        const addBtn = document.getElementById('addBtn');
+        const rollBtn = document.getElementById('rollBtn');
+        const display = document.getElementById('resultDisplay');
+        const luckInput = document.getElementById('luckMultiplier');
 
-            // 1. Add Row Button Function
-            addBtn.onclick = function() {
-                const row = document.createElement('div');
-                row.className = 'item-row';
-                row.style.marginBottom = "10px";
-                row.innerHTML = `
-                    <input type="text" class="item-name" placeholder="New Item">
-                    <span> Chance: 1 / </span>
-                    <input type="number" class="item-denominator" value="10">
-                    <input type="color" class="item-color" value="#ff0000">
-                `;
-                itemList.appendChild(row);
-            };
+        // Dynamically add new entries
+        addBtn.addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.innerHTML = `
+                <input type="text" class="item-name" placeholder="New Item Name">
+                <div class="chance-input-wrapper">
+                    <span>1/</span>
+                    <input type="number" class="item-denominator" value="5" min="0.001" step="any">
+                </div>
+                <select class="font-select">
+                    <option value="sans-serif" selected>Sans-Serif</option>
+                    <option value="serif">Serif</option>
+                    <option value="monospace">Monospace</option>
+                    <option value="fantasy">Fantasy</option>
+                    <option value="cursive">Cursive</option>
+                </select>
+                <input type="color" class="item-color" value="#3a86ff">
+                <button class="btn-delete">×</button>
+            `;
+            itemList.appendChild(row);
+        });
 
-            // 2. Roll Button Function (Independent Logic)
-            rollBtn.onclick = function() {
+        // Delete an entry row
+        itemList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-delete')) {
                 const rows = document.querySelectorAll('.item-row');
-                let winners = [];
+                if (rows.length > 1) {
+                    e.target.parentElement.remove();
+                } else {
+                    alert("Keep at least one item on the dashboard!");
+                }
+            }
+        });
 
-                for (let i = 0; i < rows.length; i++) {
-                    const name = rows[i].querySelector('.item-name').value || "Item " + (i + 1);
-                    const denominator = parseFloat(rows[i].querySelector('.item-denominator').value);
-                    const color = rows[i].querySelector('.item-color').value;
+        // Run Independent Item Roll Mechanics
+        rollBtn.addEventListener('click', () => {
+            const rows = document.querySelectorAll('.item-row');
+            let luckMultiplier = parseFloat(luckInput.value);
 
-                    if (isNaN(denominator) || denominator <= 0) {
-                        alert("Please enter a number greater than 0");
-                        return;
-                    }
+            if (isNaN(luckMultiplier) || luckMultiplier <= 0) {
+                alert("Luck multiplier must be a number greater than 0!");
+                return;
+            }
 
-                    // To simulate a "1 / X" chance:
-                    // We pick a random number between 1 and X. If it equals exactly X (or 1), it passes!
-                    const roll = Math.random() * denominator;
-                    
-                    if (roll <= 1) {
-                        // Winner! Add this specific item to our winning list
-                        winners.push({ name: name, color: color });
-                    }
+            let winners = [];
+
+            for (let row of rows) {
+                const name = row.querySelector('.item-name').value.trim() || "Mystery Loot";
+                const baseDenominator = parseFloat(row.querySelector('.item-denominator').value);
+                const selectedFont = row.querySelector('.font-select').value;
+                const assignedColor = row.querySelector('.item-color').value;
+
+                if (isNaN(baseDenominator) || baseDenominator <= 0) {
+                    alert("Please input valid targets above 0 for all item denominators.");
+                    return;
                 }
 
-                // Clear out the old display text
-                display.innerHTML = "";
+                // Apply dynamic Luck factor: Denominator gets divided by your total Luck score.
+                // Higher Luck makes the denominator smaller, meaning higher chance to hit!
+                const modifiedDenominator = baseDenominator / luckMultiplier;
 
-                // Print the results
-                if (winners.length === 0) {
-                    display.innerHTML = '<span style="color: #888888;">Nothing / Whammy</span>';
-                } else {
-                    // Loop through all the winners and build text blocks for them
-                    winners.forEach(function(item) {
-                        const itemSpan = document.createElement('span');
-                        itemSpan.style.color = item.color;
-                        itemSpan.style.marginRight = "20px";
-                        itemSpan.innerText = "[ " + item.name + " ]";
-                        display.appendChild(itemSpan);
+                // Independent dice roll simulation
+                const rolledValue = Math.random() * modifiedDenominator;
+
+                if (rolledValue <= 1) {
+                    winners.push({
+                        name: name,
+                        font: selectedFont,
+                        color: assignedColor
                     });
                 }
-            };
-        };
-    </script>
+            }
+
+            // Clear old values inside container
+            display.innerHTML = "";
+
+            if (winners.length === 0) {
+                display.innerHTML = '<span style="color: var(--text-muted); font-size: 1.6rem; font-style: italic;">Nothing / Whammy</span>';
+            } else {
+                // Populate winners tags dynamically mapping styles selected
+                winners.forEach(item => {
+                    const tag = document.createElement('div');
+                    tag.className = 'winner-tag';
+                    tag.style.color = item.color;
+                    tag.style.fontFamily = item.font;
+                    tag.innerText = item.name;
+                    display.appendChild(tag);
+                });
+            }
+        });
+    });
+</script>
 
 </body>
 </html>
