@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Independent Odds RNG</title>
+</head>
+<body>
+
+    <h1>Independent Odds RNG</h1>
+    <p>Each item rolls independently. You can win multiple prizes or nothing at all!</p>
+
+    <div id="itemList">
+        <div class="item-row" style="margin-bottom: 10px;">
+            <input type="text" class="item-name" value="Common Prize">
+            <span> Chance: 1 / </span>
+            <input type="number" class="item-denominator" value="2">
+            <input type="color" class="item-color" value="#00ff00">
+        </div>
+        <div class="item-row" style="margin-bottom: 10px;">
+            <input type="text" class="item-name" value="Rare Prize">
+            <span> Chance: 1 / </span>
+            <input type="number" class="item-denominator" value="4">
+            <input type="color" class="item-color" value="#0000ff">
+        </div>
+    </div>
+
+    <div style="margin-top: 20px; margin-bottom: 20px;">
+        <button id="addBtn">+ Add New Item</button>
+        <button id="rollBtn" style="font-weight: bold; padding: 5px 15px;">ROLL!</button>
+    </div>
+
+    <hr>
+    <h2>Results:</h2>
+    <div id="resultDisplay" style="font-size: 1.5rem; font-weight: bold; min-height: 50px;">
+        —
+    </div>
+
+    <script>
+        window.onload = function() {
+            const itemList = document.getElementById('itemList');
+            const addBtn = document.getElementById('addBtn');
+            const rollBtn = document.getElementById('rollBtn');
+            const display = document.getElementById('resultDisplay');
+
+            // 1. Add Row Button Function
+            addBtn.onclick = function() {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.style.marginBottom = "10px";
+                row.innerHTML = `
+                    <input type="text" class="item-name" placeholder="New Item">
+                    <span> Chance: 1 / </span>
+                    <input type="number" class="item-denominator" value="10">
+                    <input type="color" class="item-color" value="#ff0000">
+                `;
+                itemList.appendChild(row);
+            };
+
+            // 2. Roll Button Function (Independent Logic)
+            rollBtn.onclick = function() {
+                const rows = document.querySelectorAll('.item-row');
+                let winners = [];
+
+                for (let i = 0; i < rows.length; i++) {
+                    const name = rows[i].querySelector('.item-name').value || "Item " + (i + 1);
+                    const denominator = parseFloat(rows[i].querySelector('.item-denominator').value);
+                    const color = rows[i].querySelector('.item-color').value;
+
+                    if (isNaN(denominator) || denominator <= 0) {
+                        alert("Please enter a number greater than 0");
+                        return;
+                    }
+
+                    // To simulate a "1 / X" chance:
+                    // We pick a random number between 1 and X. If it equals exactly X (or 1), it passes!
+                    const roll = Math.random() * denominator;
+                    
+                    if (roll <= 1) {
+                        // Winner! Add this specific item to our winning list
+                        winners.push({ name: name, color: color });
+                    }
+                }
+
+                // Clear out the old display text
+                display.innerHTML = "";
+
+                // Print the results
+                if (winners.length === 0) {
+                    display.innerHTML = '<span style="color: #888888;">Nothing / Whammy</span>';
+                } else {
+                    // Loop through all the winners and build text blocks for them
+                    winners.forEach(function(item) {
+                        const itemSpan = document.createElement('span');
+                        itemSpan.style.color = item.color;
+                        itemSpan.style.marginRight = "20px";
+                        itemSpan.innerText = "[ " + item.name + " ]";
+                        display.appendChild(itemSpan);
+                    });
+                }
+            };
+        };
+    </script>
+
+</body>
+</html>
